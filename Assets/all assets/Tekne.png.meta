@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Tekne_0: -7454262629774705602
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

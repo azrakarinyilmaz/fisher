@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      kurukafa_0: -3223848866781284744
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
