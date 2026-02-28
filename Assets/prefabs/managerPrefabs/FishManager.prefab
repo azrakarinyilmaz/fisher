@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6044715337457386871
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2339964871200803199}
+  - component: {fileID: 8187064193407536493}
+  m_Layer: 0
+  m_Name: FishManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2339964871200803199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6044715337457386871}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.10874, y: 1.86459, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8187064193407536493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6044715337457386871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfdc4c2efbf66714384994c2d30ec41f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FishList:
+  - {fileID: 1531805380578234054, guid: 2aa4e8dfe2bc8354cbe0d72a822d07bb, type: 3}
+  - {fileID: 4803170668115757112, guid: 32f8713bbb138ee458f6b8dca032b7e3, type: 3}
+  - {fileID: 811348444605271430, guid: 4e54cbca0a79f74429412b992399ffc8, type: 3}
+  BossFish: {fileID: 6764639926431749787, guid: 96b94084ade91584a9a72797ce7b71bc, type: 3}
+  targetCamera: {fileID: 0}
+  cameraSafeMargin: 0.8
+  minSpawnDelay: 1.5
+  maxSpawnDelay: 4
+  maxAliveFish: 8
+  bossSpawnChance: 0.08
+  minScale: 0.85
+  maxScale: 1.25
+  minLifeTime: 3
+  maxLifeTime: 8
+  fadeInTime: 0.6
+  fadeOutTime: 0.6
+  setSortingByY: 0
+  sortingBase: 0
+  sortingMultiplier: 100
