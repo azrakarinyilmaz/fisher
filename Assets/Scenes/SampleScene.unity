@@ -44540,6 +44540,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2496085613453218227, guid: 6b12fb496f47daa459f9b4c52ac030c5, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2496085613453218227, guid: 6b12fb496f47daa459f9b4c52ac030c5, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2496085613453218227, guid: 6b12fb496f47daa459f9b4c52ac030c5, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2496085613453218227, guid: 6b12fb496f47daa459f9b4c52ac030c5, type: 3}
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
@@ -44688,10 +44700,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5853979296508327983, guid: e3b60420696b37d48b23bc0b0577022d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5853979296508327983, guid: e3b60420696b37d48b23bc0b0577022d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5853979296508327983, guid: e3b60420696b37d48b23bc0b0577022d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9203171425443784006, guid: e3b60420696b37d48b23bc0b0577022d, type: 3}
       propertyPath: boat
       value: 
       objectReference: {fileID: 964779667}
+    - target: {fileID: 9203171425443784006, guid: e3b60420696b37d48b23bc0b0577022d, type: 3}
+      propertyPath: rotationSpeed
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

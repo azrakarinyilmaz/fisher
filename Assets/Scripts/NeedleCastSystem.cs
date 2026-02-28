@@ -1,67 +1,44 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class NeedleCastSystem : MonoBehaviour
 {
-    public float rotationSpeed = 200f;   // derece/saniye
+    public float rotationSpeed = 120f;
     public float minAngle = -90f;
     public float maxAngle = 90f;
 
-    public Transform boat;
-    public Transform bobber;
-
-    public float nearDistance = 2f;      // yeşil
-    public float midDistance = 4f;       // sarı
-    public float farDistance = 6f;       // turuncu
-    public float maxDistance = 8f;       // kırmızı
-
     float currentAngle;
-    bool rotating = false;
 
-    void Start()
+    void Awake()
+    {
+        SetToMinAngle();
+    }
+
+    void OnEnable()
+    {
+        SetToMinAngle();
+    }
+
+    void SetToMinAngle()
     {
         currentAngle = minAngle;
-        transform.localRotation = Quaternion.Euler(0, 0, currentAngle);
+        transform.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            rotating = true;
-        }
+        if (!Application.isPlaying) return;
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            rotating = false;
-            CastByAngle();
-        }
+        // NEW INPUT SYSTEM
+        var mouse = Mouse.current;
+        if (mouse == null) return;
 
-        if (rotating)
-        {
-            currentAngle += rotationSpeed * Time.deltaTime;
+        bool holding = mouse.leftButton.isPressed;
+        if (!holding) return;
 
-            if (currentAngle > maxAngle)
-                currentAngle = minAngle;
+        currentAngle += rotationSpeed * Time.deltaTime;
+        if (currentAngle > maxAngle) currentAngle = maxAngle;
 
-            transform.localRotation = Quaternion.Euler(0, 0, currentAngle);
-        }
-    }
-
-    void CastByAngle()
-    {
-        float zone = Mathf.InverseLerp(minAngle, maxAngle, currentAngle);
-        float distance = 0f;
-
-        if (zone <= 0.25f)
-            distance = nearDistance;
-        else if (zone <= 0.5f)
-            distance = midDistance;
-        else if (zone <= 0.75f)
-            distance = farDistance;
-        else
-            distance = maxDistance;
-
-        Vector3 targetPos = boat.position + boat.up * distance;
-        bobber.position = targetPos;
+        transform.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
     }
 }
