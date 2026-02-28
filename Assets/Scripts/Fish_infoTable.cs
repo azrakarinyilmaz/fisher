@@ -43,6 +43,6 @@ public class Fish_infoTable : MonoBehaviour
             rarityText.text = $"Rarity: {fish.rarityPercent}%";
 
         if (valueText != null)
-            valueText.text = $"Value: {fish.coin} Coins";
+            valueText.text = $"Value: {fish.coin} ";
     }
 }
