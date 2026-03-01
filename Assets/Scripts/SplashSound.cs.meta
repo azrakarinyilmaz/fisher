@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: a6aecb98fe81a8e439e3416a86aca0d8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - audioSource: {instanceID: 0}
+  - splashClip: {fileID: 8300000, guid: 1ca6caf0f3c8a0c47841e9c8548776d0, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
