@@ -1,0 +1,41 @@
+# Game Jam Unity Project
+
+This repository contains a Unity project developed for a game jam.
+
+## Overview
+
+- Developed using **Unity** (version managed via project settings).
+- Core gameplay and features implemented during the jam.
+
+## AI Components
+
+The AI-related functionality in this project is encapsulated within the following scripts:
+
+- `DeatExitBehaviour.cs` - Handles enemy AI behavior on death and exit.
+- `gaugeSpawner.cs` - Contains logic for spawning AI-controlled gauges.
+- `NormalStandCleanup.cs` - Manages cleanup of AI entities after standing idle.
+- `SpawnOnShootEnd.cs` - Spawns AI entities or effects when shooting ends.
+
+These scripts are explicitly labeled as AI parts of the project.
+
+## Assets
+
+All visual and audio assets in this project were created **manually** by the team during the jam. No external asset store packages were used. This includes:
+
+- Animations
+- Sprites and textures
+- Audio clips and music
+- Prefabs
+- Any other art or resource files
+
+## Usage
+
+Open the project in Unity using the provided `.sln` or by launching Unity Hub and selecting the project folder.
+
+## Contribution and Push
+
+This is the initial jam submission. Any further changes should be committed and pushed to the repository.
+
+---
+
+Good luck and have fun! 🚀
