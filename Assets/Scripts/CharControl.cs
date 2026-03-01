@@ -3,12 +3,13 @@ using UnityEngine.Tilemaps;
 
 public class CharControl : MonoBehaviour
 {
+    [SerializeField] private FootstepSounds footsteps;
     [Header("Maps")]
     [SerializeField] private Tilemap walkableMap;
     [SerializeField] private Tilemap wallsMap; // opsiyonel
 
     [Header("Move")]
-    [SerializeField] private float stepTime = 0.25f; // 0 yaparsan anýnda tile tile zýplar
+    [SerializeField] private float stepTime = 0.25f; // 0 yaparsan anï¿½nda tile tile zï¿½plar
 
     [Header("Animator (BlendTree)")]
     [SerializeField] private Animator animator; // MoveX/MoveY
@@ -41,6 +42,12 @@ public class CharControl : MonoBehaviour
     void Update()
     {
         heldDir = ReadHeldDirection();
+        if (footsteps != null)
+        {
+            footsteps.SetMoveInput(new Vector2(heldDir.x, heldDir.y)); 
+        }
+        
+
         if (heldDir == Vector2Int.zero) return;
 
         if (heldDir != facing)
@@ -57,7 +64,7 @@ public class CharControl : MonoBehaviour
 
     Vector2Int ReadHeldDirection()
     {
-        // Ayný anda iki tuþ: dikey öncelik (istersen yatay öncelik yaparýz)
+        // Aynï¿½ anda iki tuï¿½: dikey ï¿½ncelik (istersen yatay ï¿½ncelik yaparï¿½z)
         bool up = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
         bool down = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
         bool left = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
@@ -95,6 +102,7 @@ public class CharControl : MonoBehaviour
         }
 
         StartCoroutine(MoveSmooth(targetPos));
+        
     }
 
     System.Collections.IEnumerator MoveSmooth(Vector3 target)
