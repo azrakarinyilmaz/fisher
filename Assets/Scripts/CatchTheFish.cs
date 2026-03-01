@@ -1,106 +1,374 @@
 using UnityEngine;
+using System.Collections;
 
 public class CatchTheFish : MonoBehaviour
 {
-    [Header("Green Zone (random)")]
-    [SerializeField] private float zoneMinLow = 10f;     // min possible start of zone
-    [SerializeField] private float zoneMaxLow = 70f;     // max possible start of zone
-    [SerializeField] private float zoneMinWidth = 10f;   // min zone width
-    [SerializeField] private float zoneMaxWidth = 30f;   // max zone width
+ 
 
-    [Header("Value (0..100)")]
-    [SerializeField] private float value = 50f;          // current value
-    [SerializeField] private float pressImpulse = 6f;    // add on each Space press
-    [SerializeField] private float decayPerSec = 18f;    // subtract per second when not pressing
-    [SerializeField] private float clampMin = 0f;
-    [SerializeField] private float clampMax = 100f;
+    [Header("References (assign in Inspector)")]
+    [SerializeField] private GameObject bar;
+    [SerializeField] private Transform spawnPoint;
+    [SerializeField] private Transform fish;
+    [SerializeField] private Transform safeZone;
 
-    [Header("Win / Lose Timers")]
-    [SerializeField] private float successSeconds = 2.0f; // must stay inside zone this long
-    [SerializeField] private float failSeconds = 3.0f;    // if outside accumulates this long -> lose
+    [SerializeField] private Collider2D fishCollider;
+    [SerializeField] private Collider2D safeZoneCollider;
 
+    [Header("Safe Zone X Range (LOCAL)")]
+    [SerializeField] private float safeMinLocalX = -4f;
+    [SerializeField] private float safeMaxLocalX = 4f;
+
+    [Header("Fish X Range (LOCAL)")]
+    [SerializeField] private float fishMinLocalX = 0f;
+    [SerializeField] private float fishMaxLocalX = 7f;
+
+    [Header("Fish Control (space spam)")]
+    [SerializeField] private float impulsePerPress = 2.5f;
+    [SerializeField] private float fishDrag = 7f;
+    [SerializeField] private float fishMaxSpeed = 7f;
+
+    [Header("Fail Rule")]
+    [SerializeField] private float failAfterSecondsOutside = 5f;
+
+    [Header("Safe Zone Stress Motion")]
+    [SerializeField] private float accelNormalMin = 0.6f;
+    [SerializeField] private float accelNormalMax = 1.8f;
+
+    [SerializeField] private float accelBurstMin = 3.0f;
+    [SerializeField] private float accelBurstMax = 7.0f;
+
+    [SerializeField] private float speedCapNormal = 1.2f;
+    [SerializeField] private float speedCapBurst = 3.4f;
+
+    [SerializeField] private float safeDamping = 2.6f;
+
+    [Header("Random Event Timing")]
+    [SerializeField] private float eventIntervalMin = 0.35f;
+    [SerializeField] private float eventIntervalMax = 0.95f;
+
+    [SerializeField] private float burstDurationMin = 0.18f;
+    [SerializeField] private float burstDurationMax = 0.45f;
+
+    [Header("Rare Downside (fixed left velocity)")]
+    [SerializeField] private float downsideChance = 0.08f;
+    [SerializeField] private float downsideFixedSpeed = 1.1f;
+    [SerializeField] private float downsideDurationMin = 0.20f;
+    [SerializeField] private float downsideDurationMax = 0.55f;
 
     [Header("Runtime (read-only)")]
-    [SerializeField] private float zoneMin;
-    [SerializeField] private float zoneMax;
-    [SerializeField] private float inZoneTime;
-    [SerializeField] private float outZoneTime;
-    [SerializeField] private bool isRunning = true;
+    [SerializeField] private bool running = true;
+    [SerializeField] private float timeOutside = 0f;
+
+    private float fishVel;
+    private float safeVel;
+    private float safeAccel;
+
+    private GameObject currentBar=null;
+
+    private enum SafeMode
+    {
+        Normal,
+        Burst,
+        Downside
+    }
+
+    [SerializeField] private SafeMode mode = SafeMode.Normal;
+
+    private float modeEndTime;
+    private float nextEventTime;
 
     public System.Action OnWin;
     public System.Action OnLose;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
-        NewRound();
+        //NewRound();
     }
 
     public void NewRound()
     {
-        // Create a random zone [zoneMin, zoneMax] within 0..100
-        float start = Random.Range(zoneMinLow, zoneMaxLow);
-        float width = Random.Range(zoneMinWidth, zoneMaxWidth);
+        currentBar = Instantiate(bar, spawnPoint.position, spawnPoint.rotation);
+        AutoAssignReferences(currentBar);
+        running = true;
 
-        zoneMin = start;
-        zoneMax = Mathf.Min(start + width, clampMax);
+        fishVel = 0f;
+        safeVel = 0f;
+        safeAccel = 0f;
 
-        // Ensure zoneMin <= zoneMax and not too tiny
-        if (zoneMax - zoneMin < 5f) zoneMax = Mathf.Min(zoneMin + 5f, clampMax);
+        timeOutside = 0f;
 
-        value = Mathf.Clamp(value, clampMin, clampMax);
-        inZoneTime = 0f;
-        outZoneTime = 0f;
-        isRunning = true;
+        if (fish != null)
+        {
+            SetLocalX(fish, fishMinLocalX);
+        }
 
-        // Debug
-        Debug.Log($"Green Zone: {zoneMin:0.0} - {zoneMax:0.0} | Start Value: {value:0.0}");
+        if (safeZone != null)
+        {
+            SetLocalX(safeZone, safeMinLocalX);
+        }
+
+        mode = SafeMode.Normal;
+        PickNormalAcceleration();
+
+        nextEventTime = Time.time + Random.Range(eventIntervalMin, eventIntervalMax);
+        modeEndTime = 0f;
+    }
+    void AutoAssignReferences(GameObject barInstance)
+    {
+        // Find children by name (must match EXACTLY in prefab)
+        fish = barInstance.transform.Find("ip");
+        safeZone = barInstance.transform.Find("safe_zone");
+
+        if (fish != null)
+            fishCollider = fish.GetComponent<Collider2D>();
+
+        if (safeZone != null)
+            safeZoneCollider = safeZone.GetComponent<Collider2D>();
     }
 
     void Update()
     {
-        if (!isRunning) return;
+        if (running == false)
+        {
+            return;
+        }
+
+        if (fish == null || safeZone == null)
+        {
+            return;
+        }
 
         float dt = Time.deltaTime;
 
-        // Space spam impulse
-        if (Input.GetKeyDown(KeyCode.Space))
-            value += pressImpulse;
+        UpdateSafeZone(dt);
+        UpdateFish(dt);
 
-        // Natural decay
-        value -= decayPerSec * dt;
-        value = Mathf.Clamp(value, clampMin, clampMax);
+        bool inZone = IsFishInSafeZoneByBounds();
 
-        // Zone check
-        bool inZone = (value >= zoneMin && value <= zoneMax);
-
-        if (inZone)
+        if (inZone == true)
         {
-            inZoneTime += dt;
-            outZoneTime = Mathf.Max(0f, outZoneTime - dt); // optional forgiveness
+            timeOutside = 0f;
         }
         else
         {
-            outZoneTime += dt;
-            inZoneTime = Mathf.Max(0f, inZoneTime - dt * 0.5f); // optional partial decay
+            timeOutside += dt;
         }
-        /*
-        // Win/Lose
-        if (inZoneTime >= successSeconds)
+
+        if (timeOutside >= failAfterSecondsOutside)
         {
-            isRunning = false;
-            Debug.Log("WIN (kept value in green zone long enough)");
-            OnWin?.Invoke();
+            Lose("Outside safe zone too long");
+            return;
         }
-        else if (outZoneTime >= failSeconds)
+
+        float safeLocalX = safeZone.localPosition.x;
+
+        // WIN only if safe zone reached end AND fish is currently in the zone
+        if (safeLocalX >= safeMaxLocalX - 0.0001f)
         {
-            isRunning = false;
-            Debug.Log("LOSE (failed to keep value in green zone)");
-            OnLose?.Invoke();
-        }*/
+            if (fish.localPosition.x == 7 && inZone)
+            {
+                Win("Safe zone reached end while fish inside");
+                return;
+            }
+        }
+        
     }
 
-    // Useful getters if you want to display UI later
-    public float GetValue01() => Mathf.InverseLerp(clampMin, clampMax, value);
-    public (float min, float max) GetZone() => (zoneMin, zoneMax);
-    public float GetInZoneProgress01() => Mathf.Clamp01(inZoneTime / Mathf.Max(0.01f, successSeconds));
+    void UpdateFish(float dt)
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            fishVel += impulsePerPress;
+        }
+
+        fishVel -= fishDrag * dt;
+        fishVel = Mathf.Clamp(fishVel, -fishMaxSpeed, fishMaxSpeed);
+
+        float newX = fish.localPosition.x + fishVel * dt;
+
+        if (newX < fishMinLocalX)
+        {
+            newX = fishMinLocalX;
+            fishVel = 0f;
+        }
+
+        if (newX > fishMaxLocalX)
+        {
+            newX = fishMaxLocalX;
+            fishVel = 0f;
+        }
+
+        SetLocalX(fish, newX);
+    }
+
+    void UpdateSafeZone(float dt)
+    {
+        if (mode != SafeMode.Downside)
+        {
+            if (Time.time >= nextEventTime)
+            {
+                StartRandomEvent();
+                nextEventTime = Time.time + Random.Range(eventIntervalMin, eventIntervalMax);
+            }
+        }
+
+        if (mode == SafeMode.Burst)
+        {
+            if (Time.time >= modeEndTime)
+            {
+                mode = SafeMode.Normal;
+                PickNormalAcceleration();
+            }
+        }
+        else if (mode == SafeMode.Downside)
+        {
+            if (Time.time >= modeEndTime)
+            {
+                mode = SafeMode.Normal;
+                PickNormalAcceleration();
+                nextEventTime = Time.time + Random.Range(eventIntervalMin, eventIntervalMax);
+            }
+        }
+
+        float speedCap = speedCapNormal;
+        if (mode == SafeMode.Burst)
+        {
+            speedCap = speedCapBurst;
+        }
+
+        if (mode == SafeMode.Downside)
+        {
+            safeVel = -Mathf.Abs(downsideFixedSpeed);
+        }
+        else
+        {
+            safeVel += safeAccel * dt;
+
+            float damp = safeDamping * dt;
+            safeVel = safeVel * (1f / (1f + damp));
+
+            safeVel = Mathf.Clamp(safeVel, -speedCap, speedCap);
+        }
+
+        float newX = safeZone.localPosition.x + safeVel * dt;
+
+        if (newX < safeMinLocalX)
+        {
+            newX = safeMinLocalX;
+            safeVel = 0f;
+
+            mode = SafeMode.Normal;
+            PickNormalAcceleration();
+
+            nextEventTime = Time.time + Random.Range(eventIntervalMin, eventIntervalMax);
+        }
+
+        if (newX > safeMaxLocalX)
+        {
+            newX = safeMaxLocalX;
+            safeVel = 0f;
+        }
+
+        SetLocalX(safeZone, newX);
+    }
+
+    void StartRandomEvent()
+    {
+        float r = Random.value;
+
+        if (r < downsideChance)
+        {
+            mode = SafeMode.Downside;
+            safeAccel = 0f;
+            modeEndTime = Time.time + Random.Range(downsideDurationMin, downsideDurationMax);
+        }
+        else
+        {
+            mode = SafeMode.Burst;
+            PickBurstAcceleration();
+            modeEndTime = Time.time + Random.Range(burstDurationMin, burstDurationMax);
+        }
+    }
+
+    void PickNormalAcceleration()
+    {
+        float a = Random.Range(accelNormalMin, accelNormalMax);
+        safeAccel = Mathf.Abs(a);
+    }
+
+    void PickBurstAcceleration()
+    {
+        float a = Random.Range(accelBurstMin, accelBurstMax);
+        safeAccel = Mathf.Abs(a);
+    }
+
+    bool IsFishInSafeZoneByBounds()
+    {
+        if (fishCollider == null)
+        {
+            return false;
+        }
+
+        if (safeZoneCollider == null)
+        {
+            return false;
+        }
+
+        if (fishCollider.bounds.Intersects(safeZoneCollider.bounds))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    void SetLocalX(Transform t, float x)
+    {
+        Vector3 p = t.localPosition;
+        p.x = x;
+        t.localPosition = p;
+    }
+
+    void Win(string reason)
+    {
+        running = false;
+        Debug.Log("WIN: " + reason);
+
+        // ALWAYS destroy spawned bar
+        if (currentBar != null)
+        {
+            Destroy(currentBar);
+            currentBar = null;
+        }
+
+        // Optional event
+        OnWin?.Invoke();
+
+        // Optional: clear refs so Update() doesn't keep running on null stuff
+        fish = null;
+        safeZone = null;
+        fishCollider = null;
+        safeZoneCollider = null;
+    }
+
+    void Lose(string reason)
+    {
+        running = false;
+        Debug.Log("LOSE: " + reason);
+
+        // ALWAYS destroy spawned bar
+        if (currentBar != null)
+        {
+            Destroy(currentBar);
+            currentBar = null;
+        }
+
+        // Optional event
+        OnLose?.Invoke();
+
+        fish = null;
+        safeZone = null;
+        fishCollider = null;
+        safeZoneCollider = null;
+    }
 }

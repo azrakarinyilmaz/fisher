@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,6 +7,10 @@ public class NeedleCastSystem : MonoBehaviour
     [Header("Angles")]
     public float minAngle = -90f;
     public float maxAngle = 90f;
+    private bool justStarted;
+    public Animator animator;
+    public GameObject parent;
+  
 
     [Header("Time to go from min to max (seconds)")]
     public float sweepDuration = 1.0f;  // 0.6 hızlı, 1.0 ideal
@@ -20,6 +25,11 @@ public class NeedleCastSystem : MonoBehaviour
 
         ApplyRotation(); // kaldığı yerden devam etsin
     }
+    private void Start()
+    {
+        justStarted = true;
+        animator = GameObject.Find("pulled_phase").GetComponent<Animator>();
+    }
 
     void Update()
     {
@@ -28,8 +38,18 @@ public class NeedleCastSystem : MonoBehaviour
         var mouse = Mouse.current;
         if (mouse == null) return;
 
-        if (!mouse.leftButton.isPressed)
-            return;
+        if (!mouse.leftButton.isPressed) {
+
+            if (!justStarted){ 
+                animator.SetTrigger("throw");
+                StartCoroutine(Wait());
+                
+                return; 
+            }
+        }
+
+        else justStarted = false;
+
 
         float step = Time.unscaledDeltaTime / Mathf.Max(0.01f, sweepDuration);
         t += dir * step;
@@ -39,6 +59,11 @@ public class NeedleCastSystem : MonoBehaviour
         if (t <= 0f) { t = 0f; dir = 1; }
 
         ApplyRotation();
+    }
+    private IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(3);
+        Destroy(parent);
     }
 
     void ApplyRotation()
