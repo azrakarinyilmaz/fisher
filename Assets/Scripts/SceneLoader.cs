@@ -7,4 +7,9 @@ public class SceneLoader : MonoBehaviour
     {
         SceneManager.LoadScene("SampleScene");
     }
+
+    public void LoadDungeoun()
+    {
+        SceneManager.LoadScene("dungeon");
+    }
 }
