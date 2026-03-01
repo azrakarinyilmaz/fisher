@@ -62,7 +62,7 @@ public class NeedleCastSystem : MonoBehaviour
     }
     private IEnumerator Wait()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
         Destroy(parent);
     }
 
