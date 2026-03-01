@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class inventoryManager : MonoBehaviour
 {
+    public static inventoryManager Instance;
+
     [Header("Money")]
     [SerializeField] private int coins = 0;
     public int Coins => coins;
@@ -11,43 +13,47 @@ public class inventoryManager : MonoBehaviour
     [Range(0f, 100f)]
     [SerializeField] private float rareThresholdPercent = 70f;
 
-    // how many of each fish you’ve caught (by id/name)
     private Dictionary<string, int> caughtCounts = new Dictionary<string, int>();
-
-    // list of fish ids that are considered "max rare" and have been caught at least once
     public HashSet<string> rareCaught = new HashSet<string>();
 
-    /// <summary>Add a fish catch to inventory + money.</summary>
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject); 
+    }
+
     public void RegisterCatch(FishClass fish)
     {
         if (fish == null) return;
 
+        string key = fish.f_name;
+
         coins += fish.coin;
 
-        string key = GetFishKey(fish);
+        if (caughtCounts.ContainsKey(key))
+        {
+            Debug.Log($"Caught AGAIN {key} | +{fish.coin} coins | Total={coins}");
+            return;
+        }
 
-        if (caughtCounts.ContainsKey(key)) caughtCounts[key]++;
-        else caughtCounts[key] = 1;
+        caughtCounts[key] = 1;
 
-        if (fish.rarityPercent > rareThresholdPercent)
+        if (fish.rarityPercent >= rareThresholdPercent)
             rareCaught.Add(key);
 
-        Debug.Log($"Caught {key} | +{fish.coin} coins | Total={coins} | Rare(>{rareThresholdPercent})={rareCaught.Contains(key)}");
+        Debug.Log($"Caught NEW {key} | +{fish.coin} coins | Total={coins}");
     }
 
-    public int GetCaughtCount(FishClass fish)
+    public int GetCaughtCount(string fishName)
     {
-        if (fish == null) return 0;
-        string key = GetFishKey(fish);
-        return caughtCounts.TryGetValue(key, out int count) ? count : 0;
+        return caughtCounts.TryGetValue(fishName, out int count) ? count : 0;
     }
 
     public int RareCaughtCount() => rareCaught.Count;
-
-    private string GetFishKey(FishClass fish)
-    {
-        // Best: fish.id if you have it.
-        // For now: use type (or name). Make sure it's unique.
-        return fish.type;
-    }
 }
