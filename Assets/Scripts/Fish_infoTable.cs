@@ -45,5 +45,5 @@ public class Fish_infoTable : MonoBehaviour
         if (valueText != null)
             valueText.text = $"Value: {fish.coin} Coins";
     }
-        RectTransform winPanel = fishPanel.gameObject.GetComponent<RectTransform>();
+        //RectTransform winPanel = fishPanel.gameObject.GetComponent<RectTransform>();
 }
