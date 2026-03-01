@@ -124,7 +124,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  directionChangeTime: 10
+  minDirectionTime: 5
+  maxDirectionTime: 10
   targetCamera: {fileID: 0}
   safeMargin: 0.5
   rotateToMove: 1

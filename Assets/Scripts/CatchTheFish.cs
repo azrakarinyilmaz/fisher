@@ -63,6 +63,8 @@ public class CatchTheFish : MonoBehaviour
     private float safeVel;
     private float safeAccel;
 
+    public Animator animator;
+
     private GameObject currentBar=null;
 
     private enum SafeMode
@@ -87,6 +89,7 @@ public class CatchTheFish : MonoBehaviour
 
     public void NewRound()
     {
+        animator.SetBool("roll", true);
         currentBar = Instantiate(bar, spawnPoint.position, spawnPoint.rotation);
         AutoAssignReferences(currentBar);
         running = true;
@@ -343,6 +346,7 @@ public class CatchTheFish : MonoBehaviour
 
         // Optional event
         OnWin?.Invoke();
+        animator.SetTrigger("pull");
 
         // Optional: clear refs so Update() doesn't keep running on null stuff
         fish = null;
@@ -355,6 +359,7 @@ public class CatchTheFish : MonoBehaviour
     {
         running = false;
         Debug.Log("LOSE: " + reason);
+        
 
         // ALWAYS destroy spawned bar
         if (currentBar != null)
@@ -365,7 +370,7 @@ public class CatchTheFish : MonoBehaviour
 
         // Optional event
         OnLose?.Invoke();
-
+        animator.SetBool("roll", false);
         fish = null;
         safeZone = null;
         fishCollider = null;

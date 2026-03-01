@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class Fish_infoTable : MonoBehaviour
 {
@@ -15,15 +17,68 @@ public class Fish_infoTable : MonoBehaviour
 
     [Header("UI")]
     public GameObject fishPanel;
-    public Image icon;
+    public UnityEngine.UI.Image icon;
 
     private FishClass fish;
 
+    [SerializeField] private CatchTheFish manager;
+    public RectTransform winPanel;
+    [SerializeField] private float panelSpeed = 500f;
+
     void Start()
     {
-        Catched();
+        //Catched();
+         winPanel = fishPanel.GetComponent<RectTransform>();
+    }
+    void OnEnable()
+    {
+        if (manager != null)
+        {
+            manager.OnWin += HandleWin;
+        }
     }
 
+    void OnDisable()
+    {
+        if (manager != null)
+        {
+            manager.OnWin -= HandleWin;
+        }
+    }
+    void HandleWin()
+    {
+        // call whatever function you want here
+        Catched();
+        StopAllCoroutines();
+        StartCoroutine(MovePanelRoutine());
+    }
+    IEnumerator MovePanelRoutine()
+    {
+        // Start at -200
+        Vector2 p = winPanel.anchoredPosition;
+        p.y = -200f;
+        winPanel.anchoredPosition = p;
+
+        // Move UP to 200
+        while (winPanel.anchoredPosition.y != 200f)
+        {
+            p = winPanel.anchoredPosition;
+            p.y = Mathf.MoveTowards(p.y, 200f, panelSpeed * Time.deltaTime);
+            winPanel.anchoredPosition = p;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(7f);
+
+        // Move DOWN to -200
+        while (winPanel.anchoredPosition.y != -200f)
+        {
+            p = winPanel.anchoredPosition;
+            p.y = Mathf.MoveTowards(p.y, -200f, panelSpeed * Time.deltaTime);
+            winPanel.anchoredPosition = p;
+            yield return null;
+        }
+    }
     public void Catched()
     {
         if (FishList == null || FishList.Count == 0) return;
@@ -44,6 +99,8 @@ public class Fish_infoTable : MonoBehaviour
 
         if (valueText != null)
             valueText.text = $"Value: {fish.coin} Coins";
+
+       
     }
-    //RectTransform winPanel = fishPanel.gameObject.GetComponent<RectTransform>();
+    
 }
