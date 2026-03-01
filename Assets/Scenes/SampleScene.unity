@@ -928,8 +928,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d66e81ee4495654297608549fa8a73d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coins: 0
-  rareThresholdPercent: 70
 --- !u!4 &689688148
 Transform:
   m_ObjectHideFlags: 0

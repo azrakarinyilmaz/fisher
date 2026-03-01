@@ -6288,8 +6288,9 @@ GameObject:
   - component: {fileID: 820346127}
   - component: {fileID: 820346126}
   - component: {fileID: 820346130}
+  - component: {fileID: 820346131}
   m_Layer: 0
-  m_Name: Square
+  m_Name: Gate
   m_TagString: win
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6559,6 +6560,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911446294}
   m_CullTransparentMesh: 1
+  m_GameObject: {fileID: 820346125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcb2bc5c1c4a6e849b5a5c98ac06b8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &956473583
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6864,6 +6871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1112447758}
   - component: {fileID: 1112447757}
+  - component: {fileID: 1112447759}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -6885,6 +6893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   losePanel: {fileID: 0}
   char_controller: {fileID: 6633789018460683477}
+  loader: {fileID: 1112447759}
 --- !u!4 &1112447758
 Transform:
   m_ObjectHideFlags: 0
@@ -7166,6 +7175,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1804790408}
   m_CullTransparentMesh: 1
+  m_GameObject: {fileID: 1112447756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcb2bc5c1c4a6e849b5a5c98ac06b8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1827071322
 PrefabInstance:
   m_ObjectHideFlags: 0

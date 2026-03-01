@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LosePanelUI losePanel; // LosePanelUI referansı
 
     public CharControl char_controller;
+    public SceneLoader loader;
 
     private void Awake()
     {
@@ -32,9 +33,13 @@ public class GameManager : MonoBehaviour
     // 2) Sonra karakter kontrolünü kapat (null güvenli)
     if (char_controller != null)
     {
+
         var cc = char_controller.GetComponent<CharControl>();
         if (cc != null) cc.enabled = false;
         else Debug.LogWarning("CharControl component not found on char_controller!");
+
+        char_controller.GetComponent<Animator>().SetTrigger("isDead");
+
     }
     else
     {
@@ -60,6 +65,8 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("YOU WIN!");
         char_controller.GetComponent<CharControl>().enabled = false;
+        //yield return new WaitForSeconds(0.8f);
+        loader.LoadMainScene();
 
         //Time.timeScale = 0f; // Oyunu durdurur
 
