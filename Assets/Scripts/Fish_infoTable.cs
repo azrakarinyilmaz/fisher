@@ -22,6 +22,7 @@ public class Fish_infoTable : MonoBehaviour
     private FishClass fish;
 
     [SerializeField] private CatchTheFish manager;
+    [SerializeField] private inventoryManager progress;
     public RectTransform winPanel;
     [SerializeField] private float panelSpeed = 500f;
 
@@ -84,6 +85,9 @@ public class Fish_infoTable : MonoBehaviour
         if (FishList == null || FishList.Count == 0) return;
 
         fish = FishList[Random.Range(0, FishList.Count)];
+
+        if (progress != null)
+            progress.RegisterCatch(fish);
 
         if (fishPanel != null)
             fishPanel.SetActive(true);
